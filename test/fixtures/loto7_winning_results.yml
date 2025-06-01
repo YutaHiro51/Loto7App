@@ -1,0 +1,57 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  lottery_round: MyString
+  main_num_1: 1
+  main_num_2: 1
+  main_num_3: 1
+  main_num_4: 1
+  main_num_5: 1
+  main_num_6: 1
+  main_num_7: 1
+  bonus_num_1: 1
+  bonus_num_2: 1
+  set_ball: MyString
+  lottery_date: 2025-05-26
+  actual_sales_amount: 1
+  prize_1_winners: 1
+  prize_1: 1
+  prize_2_winners: 1
+  prize_2: 1
+  prize_3_winners: 1
+  prize_3: 1
+  prize_4_winners: 1
+  prize_4: 1
+  prize_5_winners: 1
+  prize_5: 1
+  prize_6_winners: 1
+  prize_6: 1
+  carry_over: 1
+
+two:
+  lottery_round: MyString
+  main_num_1: 1
+  main_num_2: 1
+  main_num_3: 1
+  main_num_4: 1
+  main_num_5: 1
+  main_num_6: 1
+  main_num_7: 1
+  bonus_num_1: 1
+  bonus_num_2: 1
+  set_ball: MyString
+  lottery_date: 2025-05-26
+  actual_sales_amount: 1
+  prize_1_winners: 1
+  prize_1: 1
+  prize_2_winners: 1
+  prize_2: 1
+  prize_3_winners: 1
+  prize_3: 1
+  prize_4_winners: 1
+  prize_4: 1
+  prize_5_winners: 1
+  prize_5: 1
+  prize_6_winners: 1
+  prize_6: 1
+  carry_over: 1

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title><%= content_for(:title) || "Loto Seven" %></title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Language" content="ja">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <div class="layout-container">
+      <aside class="sidebar">
+        <nav>
+          <ul class="sidebar-menu">
+            <li>
+              <%= link_to "抽選結果一覧", loto7_winning_results_path, class: current_page?(controller: 'loto7_winning_results', action: 'index') ? 'active' : '' %>
+            </li>
+            <li>
+              <%= link_to "購入番号管理", loto7_purchases_path, class: current_page?(controller: 'loto7_purchases', action: 'index') ? 'active' : '' %>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <% if content_for?(:page_title) %>
+          <h1 class="page-title"><%= yield :page_title %></h1>
+        <% end %>
+
+        <% flash.each do |name, msg| %>
+          <div class="flash-message <%= name %>">
+            <%= msg %>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

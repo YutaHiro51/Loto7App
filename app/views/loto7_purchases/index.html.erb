@@ -1,0 +1,420 @@
+<% content_for :page_title, "購入番号管理" %>
+
+<div class="purchase-list" data-turbo="false">
+  <div class="header-section">
+    <h2>購入番号一覧</h2>
+    <button onclick="openModal()" class="add-button">
+      <i class="fas fa-plus"></i>
+      購入番号を追加
+    </button>
+  </div>
+  
+  <div class="total-amount">
+    合計金額: <%= number_to_currency(@total_amount, unit: "¥", precision: 0) %>
+  </div>
+
+  <div class="numbers-table">
+    <table>
+      <div class="button-group">
+        <%= button_to check_results_loto7_purchases_path, method: :post, class: "check-button", data: { turbo: false } do %>
+          <i class="fas fa-sync-alt"></i> 当選結果を確認
+        <% end %>
+      </div>
+
+      <thead>
+        <tr>
+          <th>購入番号</th>
+          <th>当選結果</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @loto7_purchases.each do |purchase| %>
+          <tr>
+            <td class="numbers-cell">
+              <% purchase.purchase_numbers.each do |number| %>
+                <% if @latest_result %>
+                  <% match_type = purchase.number_matches(@latest_result)[purchase.purchase_numbers.index(number)] %>
+                  <span class="number <%= match_type %>">
+                    <%= number %>
+                  </span>
+                <% else %>
+                  <span class="number">
+                    <%= number %>
+                  </span>
+                <% end %>
+              <% end %>
+            </td>
+            <td class="result-cell">
+              <% if @latest_result %>
+                <% if result = purchase.check_result(@latest_result) %>
+                  <span class="win">
+                    <%= result[:rank] %>等
+                    <span class="prize"><%= number_to_currency(result[:prize], unit: "¥", precision: 0) %></span>
+                  </span>
+                <% else %>
+                  <span class="no-win">はずれ</span>
+                <% end %>
+              <% else %>
+                <span class="pending">確認待ち</span>
+              <% end %>
+            </td>
+            <td class="action-cell">
+              <%= button_to "削除", loto7_purchase_path(purchase), method: :delete, class: "delete-button", data: { turbo: false } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="winning-conditions">
+    <h3>当せん条件</h3>
+    <div class="conditions-grid">
+      <div class="condition-item">
+        <span class="rank">1等</span>
+        <span class="description">申込数字が本数字7個と全て一致</span>
+      </div>
+      <div class="condition-item">
+        <span class="rank">2等</span>
+        <span class="description">申込数字が本数字6個と一致し、更にボーナス数字2個のうち1個と一致</span>
+      </div>
+      <div class="condition-item">
+        <span class="rank">3等</span>
+        <span class="description">申込数字が本数字6個と一致</span>
+      </div>
+      <div class="condition-item">
+        <span class="rank">4等</span>
+        <span class="description">申込数字が本数字5個と一致</span>
+      </div>
+      <div class="condition-item">
+        <span class="rank">5等</span>
+        <span class="description">申込数字が本数字4個と一致</span>
+      </div>
+      <div class="condition-item">
+        <span class="rank">6等</span>
+        <span class="description">申込数字が本数字3個と一致し、更にボーナス数字1個または2個と一致</span>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .numbers-table {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    .numbers-table table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .numbers-table th,
+    .numbers-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .numbers-table tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .numbers-table th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .index-cell {
+      width: 60px;
+      text-align: center;
+      color: #666;
+    }
+
+    .action-cell {
+      width: 100px;
+      text-align: center;
+    }
+
+    .numbers-cell {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 280px;
+      padding: 8px 0;
+    }
+
+    .numbers-cell .number {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 1.1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-cell {
+      min-width: 200px;
+      padding: 8px;
+    }
+
+    .pending {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      color: #6c757d;
+      font-size: 0.9rem;
+      border: 1px solid #dee2e6;
+    }
+
+    .number.main {
+      background-color: #dc3545;
+      border: 2px solid #dc3545;
+    }
+
+    .number.bonus {
+      background-color: #ffc107;
+      color: #000;
+      border: 2px solid #ffc107;
+    }
+
+    .number.no-match {
+      background-color: #6c757d;
+      border: 2px solid #6c757d;
+      opacity: 0.7;
+    }
+
+    .button-group {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .win {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .no-win {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .prize {
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .check-button {
+      margin: 10px 0;
+      padding: 8px 16px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check-button:hover {
+      opacity: 0.9;
+    }
+
+    .winning-result {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .no-win {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .win {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .delete-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .delete-button:hover {
+      background-color: #c82333;
+      transform: translateY(-1px);
+    }
+
+    .action-cell {
+      text-align: center;
+      padding: 8px;
+    }
+
+    .numbers-table th:nth-child(1) { width: 40%; }
+    .numbers-table th:nth-child(2) { width: 40%; }
+    .numbers-table th:nth-child(3) { width: 20%; }
+
+    .winning-conditions {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .winning-conditions h3 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 8px;
+    }
+
+    .conditions-grid {
+      display: grid;
+      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .condition-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 6px;
+    }
+
+    .condition-item .rank {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      min-width: 45px;
+      text-align: center;
+    }
+
+    .condition-item .description {
+      font-size: 0.95rem;
+      color: #333;
+      line-height: 1.4;
+    }
+  </style>
+</div>
+
+<%= render 'purchase_modal' %>
+
+<% content_for :head do %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .add-button {
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-button:hover {
+      background-color: #357abd;
+    }
+
+    .numbers-container {
+      display: grid;
+      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .number-card {
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+    }
+
+    .numbers {
+      display: flex;
+      gap: 8px;
+    }
+
+    .number {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    .delete-button {
+      padding: 5px 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-button:hover {
+      background-color: #c82333;
+    }
+
+    .total-amount {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 20px 0;
+      color: var(--primary-color);
+      padding: 15px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+<% end %>

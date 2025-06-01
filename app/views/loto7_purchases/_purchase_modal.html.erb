@@ -1,0 +1,151 @@
+<div id="purchaseModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>新規購入番号登録</h2>
+      <button type="button" class="close-button" onclick="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <%= form_with(model: Loto7Purchase.new, local: true, class: "number-form") do |f| %>
+        <%= f.hidden_field :number_set %>
+        <div class="number-inputs">
+          <% 7.times do |i| %>
+            <div class="number-input-group">
+              <label>第<%= i + 1 %>数字</label>
+              <input type="number" min="1" max="37" class="number-field" data-index="<%= i %>" required>
+            </div>
+          <% end %>
+        </div>
+        <%= f.submit "登録", class: "submit-button", data: { disable_with: "登録中..." } %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-button {
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.number-form');
+  const numberFields = document.querySelectorAll('.number-field');
+  const numberSetField = document.querySelector('#loto7_purchase_number_set');
+
+  // 数値入力フィールドの制御
+  numberFields.forEach((field, index) => {
+    field.addEventListener('input', function() {
+      const value = parseInt(this.value);
+      if (value > 37) this.value = 37;
+      if (value < 1) this.value = 1;
+      
+      // 2桁入力時に次のフィールドへ
+      if (this.value.length === 2 || value >= 3) {
+        const nextField = numberFields[index + 1];
+        if (nextField) nextField.focus();
+      }
+    });
+
+    // 上下キーでの数値調整
+    field.addEventListener('keydown', function(e) {
+      const value = parseInt(this.value) || 0;
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.value = Math.min(value + 1, 37);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.value = Math.max(value - 1, 1);
+      }
+    });
+  });
+
+  // フォームの送信処理
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const numbers = Array.from(numberFields).map(field => parseInt(field.value));
+    
+    if (numbers.some(num => isNaN(num))) {
+      alert('すべての数字を入力してください');
+      return;
+    }
+
+    if (new Set(numbers).size !== 7) {
+      alert('同じ数字は使用できません');
+      return;
+    }
+
+    if (!numbers.every(num => num >= 1 && num <= 37)) {
+      alert('1から37の範囲で入力してください');
+      return;
+    }
+
+    numberSetField.value = numbers.join(',');
+    form.submit();
+  });
+});
+
+// モーダル制御
+function openModal() {
+  const modal = document.getElementById('purchaseModal');
+  modal.style.display = 'block';
+  document.querySelector('.number-field').focus();
+}
+
+function closeModal() {
+  const modal = document.getElementById('purchaseModal');
+  modal.style.display = 'none';
+  document.querySelector('.number-form').reset();
+}
+
+// モーダルの外側をクリックしたときに閉じる
+window.onclick = function(event) {
+  const modal = document.getElementById('purchaseModal');
+  if (event.target == modal) {
+    closeModal();
+  }
+}
+</script>

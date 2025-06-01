@@ -1,0 +1,2 @@
+module Loto7PurchasesHelper
+end

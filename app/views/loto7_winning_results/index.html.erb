@@ -1,0 +1,132 @@
+<% content_for :page_title, "ロト7 抽選結果一覧" %>
+
+<div class="action-buttons">
+  <%= button_to update_from_web_loto7_winning_results_path, method: :post, class: "update-button" do %>
+    <i class="fas fa-sync-alt"></i> 最新の抽選結果を取得
+  <% end %>
+</div>
+
+<div class="results-list">
+  <% @loto7_winning_results.each do |result| %>
+    <%= link_to loto7_winning_result_path(result), class: "result-card" do %>
+      <div class="result-header">
+        <span class="lottery-round">第<%= result.lottery_round %>回</span>
+        <span class="lottery-date"><%= result.formatted_lottery_date %></span>
+      </div>
+
+      <div class="numbers-container">
+        <div class="main-numbers">
+          <% result.main_numbers.each do |number| %>
+            <span class="number"><%= number %></span>
+          <% end %>
+        </div>
+
+        <div class="bonus-numbers">
+          <% result.bonus_numbers.each do |number| %>
+            <span class="bonus-number"><%= number %></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<%= paginate @loto7_winning_results %>
+
+<% content_for :head do %>
+  <style>
+    .action-buttons {
+      margin-bottom: 20px;
+    }
+
+    .update-button {
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.3s;
+    }
+
+    .update-button:hover {
+      opacity: 0.9;
+    }
+
+    .update-button i {
+      font-size: 1.1rem;
+    }
+    .results-list {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      display: block;
+      padding: 15px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.3s;
+    }
+
+    .result-card:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .lottery-round {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .lottery-date {
+      color: #666;
+    }
+
+    .numbers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .main-numbers, .bonus-numbers {
+      display: flex;
+      gap: 8px;
+    }
+
+    .number, .bonus-number {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    .number {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .bonus-number {
+      background-color: var(--primary-color);
+      color: white;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<% end %>

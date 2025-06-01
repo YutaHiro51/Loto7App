@@ -1,0 +1,66 @@
+<div class="purchase-list">
+  <div class="header-section">
+    <h2>購入番号一覧</h2>
+    <button onclick="openModal()" class="add-button">
+      <i class="fas fa-plus"></i>
+      購入番号を追加
+    </button>
+  </div>
+  
+  <div class="total-amount">
+    合計金額: <%= number_to_currency(@total_amount, unit: "¥", precision: 0) %>
+  </div>
+
+  <div class="numbers-table">
+    <%= button_to check_results_loto7_purchases_path, method: :post, class: "check-button", data: { turbo: true } do %>
+      <i class="fas fa-sync-alt"></i> 当選結果を確認
+    <% end %>
+
+    <table>
+      <thead>
+        <tr>
+          <th>購入番号</th>
+          <th>当選結果</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @loto7_purchases.each do |purchase| %>
+          <tr>
+            <td class="numbers-cell">
+              <% purchase.purchase_numbers.each do |number| %>
+                <% if @latest_result %>
+                  <% match_type = purchase.number_matches(@latest_result)[purchase.purchase_numbers.index(number)] %>
+                  <span class="number <%= match_type %>">
+                    <%= number %>
+                  </span>
+                <% else %>
+                  <span class="number">
+                    <%= number %>
+                  </span>
+                <% end %>
+              <% end %>
+            </td>
+            <td class="result-cell">
+              <% if @latest_result %>
+                <% if result = purchase.check_result(@latest_result) %>
+                  <span class="win">
+                    <%= result[:rank] %>等
+                    <span class="prize"><%= number_to_currency(result[:prize], unit: "¥", precision: 0) %></span>
+                  </span>
+                <% else %>
+                  <span class="no-win">はずれ</span>
+                <% end %>
+              <% else %>
+                <span class="pending">確認待ち</span>
+              <% end %>
+            </td>
+            <td class="action-cell">
+              <%= button_to "削除", loto7_purchase_path(purchase), method: :delete, class: "delete-button" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

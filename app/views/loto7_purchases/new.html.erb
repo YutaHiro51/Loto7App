@@ -1,0 +1,307 @@
+<% content_for :page_title, @title %>
+
+<div id="particles-js"></div>
+<div class="light-effect"></div>
+<div class="quick-pick">
+  <div class="quick-pick-container">
+    <button id="generateButton" class="action-button check-button">
+      <i class="fas fa-random"></i>
+      クイックピック
+    </button>
+    <div id="numbersDisplay" class="numbers-display"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<style>
+  .quick-pick {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  #particles-js.active {
+    opacity: 1;
+  }
+
+  .quick-pick {
+    position: relative;
+    z-index: 1;
+  }
+
+  .quick-pick-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .numbers-display {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 80px;
+    width: 100%;
+    position: relative;
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+  }
+
+  .light-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 0%, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 0.5s;
+  }
+
+  .light-effect.active {
+    animation: pulseLight 2s ease-out;
+  }
+
+  @keyframes pulseLight {
+    0% {
+      opacity: 0;
+      transform: scale(0.1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(2);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(3);
+    }
+  }
+
+  @keyframes slideFromCorner {
+    0% {
+      transform: translate3d(var(--start-x), var(--start-y), 0) scale3d(0.3, 0.3, 1) rotate3d(0, 0, 1, -360deg);
+      opacity: 0;
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      transform: translate3d(0, 0, 0) scale3d(1.5, 1.5, 1) rotate3d(0, 0, 1, 0deg);
+      opacity: 0.8;
+      filter: hue-rotate(180deg);
+    }
+    75% {
+      transform: translate3d(0, 0, 0) scale3d(0.8, 0.8, 1) rotate3d(0, 0, 1, 0deg);
+      filter: hue-rotate(360deg);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate3d(0, 0, 1, 0deg);
+      opacity: 1;
+      filter: hue-rotate(0deg);
+    }
+  }
+
+  #generateButton {
+    min-width: 180px;
+    height: 45px;
+    padding: 12px 24px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+  }
+
+  #generateButton:hover {
+    background-color: #357abd;
+  }
+
+  #generateButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+
+  .numbers-display {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .number {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+    will-change: transform, opacity, filter;
+  }
+
+  .number:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+  }
+
+  @keyframes popIn {
+    0% {
+      transform: scale(0) rotate(-180deg);
+      opacity: 0;
+      background-color: #ffc107;
+    }
+    50% {
+      transform: scale(1.2) rotate(0deg);
+      opacity: 0.8;
+    }
+    80% {
+      transform: scale(0.9);
+      background-color: var(--primary-color);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const generateButton = document.getElementById('generateButton');
+    const numbersDisplay = document.getElementById('numbersDisplay');
+
+    let isAnimating = false;
+
+    generateButton.addEventListener('click', function() {
+      if (isAnimating) return;
+      
+      isAnimating = true;
+      generateButton.disabled = true;
+      // 1-37の配列を作成
+      const numbers = Array.from({length: 37}, (_, i) => i + 1);
+      
+      // Fisher-Yatesアルゴリズムでシャッフル
+      for (let i = numbers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+      }
+
+      // 最初の7つを取得して昇順にソート
+      const selectedNumbers = numbers.slice(0, 7).sort((a, b) => a - b);
+
+      // 表示をクリア
+      numbersDisplay.innerHTML = '';
+      
+      // 演出効果の開始
+      const particlesContainer = document.getElementById('particles-js');
+      const lightEffect = document.querySelector('.light-effect');
+      
+      particlesContainer.classList.add('active');
+      lightEffect.classList.add('active');
+      
+      // パーティクルJSの初期化
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 150 },
+          color: { value: ['#ffc107', '#ff5722', '#2196f3'] },
+          shape: { type: 'circle' },
+          opacity: {
+            value: 0.7,
+            random: true
+          },
+          size: {
+            value: 5,
+            random: true
+          },
+          move: {
+            speed: 8,
+            direction: 'none',
+            random: true,
+            out_mode: 'out',
+            bounce: true
+          }
+        }
+      });
+
+      // 数字を表示（四隅から中央へ）
+      const corners = [
+        { x: '-100vw', y: '-100vh' },
+        { x: '100vw', y: '-100vh' },
+        { x: '-100vw', y: '100vh' },
+        { x: '100vw', y: '100vh' },
+        { x: '-100vw', y: '0' },
+        { x: '100vw', y: '0' },
+        { x: '0', y: '-100vh' }
+      ];
+
+      // 要素を一括で作成してDOMに追加
+      const fragment = document.createDocumentFragment();
+      selectedNumbers.forEach((number, index) => {
+        const span = document.createElement('span');
+        span.className = 'number';
+        span.textContent = number;
+        span.style.setProperty('--start-x', corners[index].x);
+        span.style.setProperty('--start-y', corners[index].y);
+        span.style.opacity = '0';
+        fragment.appendChild(span);
+      });
+      numbersDisplay.appendChild(fragment);
+
+      // アニメーションを開始
+      requestAnimationFrame(() => {
+        const spans = numbersDisplay.children;
+        for (let i = 0; i < spans.length; i++) {
+          const span = spans[i];
+          span.style.animation = `slideFromCorner 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) ${i * 150}ms forwards`;
+        }
+      });
+
+      // 演出効果の終了
+      setTimeout(() => {
+        particlesContainer.classList.remove('active');
+        lightEffect.classList.remove('active');
+        
+        // 新しいアニメーションのために状態をリセット
+        setTimeout(() => {
+          lightEffect.style.animation = 'none';
+          lightEffect.offsetHeight; // reflow
+          lightEffect.style.animation = null;
+        }, 500);
+        isAnimating = false;
+        generateButton.disabled = false;
+      }, 3000);
+    });
+  });
+</script>

@@ -4,9 +4,10 @@ Rails.application.routes.draw do
   resources :loto7_winning_results, only: [:index, :show] do
     collection do
       post :update_from_web
+      get :analysis
     end
   end
-  resources :loto7_purchases, only: [:index, :create, :destroy] do
+  resources :loto7_purchases, only: [:index, :create, :destroy, :new] do
     collection do
       post 'check_results'
     end

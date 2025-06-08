@@ -1,31 +1,48 @@
 require 'mechanize'
 
 class Loto7WinningResult < ApplicationRecord
-  # Public instance methods
-  def formatted_lottery_date
-    lottery_date&.strftime('%Y年%m月%d日')
+  self.table_name = 'loto7WinningResults'
+  
+  attr_reader :lottery_round
+  scope :newest_first, -> { order(lottery_date: :desc) }
+
+  def winning_numbers
+    [
+      main_num_1, main_num_2, main_num_3, main_num_4,
+      main_num_5, main_num_6, main_num_7
+    ].sort
   end
 
   def main_numbers
     [
       main_num_1, main_num_2, main_num_3, main_num_4,
       main_num_5, main_num_6, main_num_7
-    ]
+    ].sort
   end
 
   def bonus_numbers
-    [bonus_num_1, bonus_num_2]
+    [bonus_num_1, bonus_num_2].sort
+  end
+
+  def formatted_lottery_date
+    lottery_date&.strftime('%Y年%m月%d日')
+  end
+
+  def lottery_round
+    self[:lottery_round]
   end
 
   def prize_data
-    (1..6).map do |rank|
-      {
-        rank: rank,
-        winners: send("prize_#{rank}_winners"),
-        amount: send("prize_#{rank}")
-      }
-    end
+    [
+      { rank: 1, winners: prize_1_winners, amount: prize_1 },
+      { rank: 2, winners: prize_2_winners, amount: prize_2 },
+      { rank: 3, winners: prize_3_winners, amount: prize_3 },
+      { rank: 4, winners: prize_4_winners, amount: prize_4 },
+      { rank: 5, winners: prize_5_winners, amount: prize_5 },
+      { rank: 6, winners: prize_6_winners, amount: prize_6 }
+    ]
   end
+
   def self.scrape_latest_results
     agent = Mechanize.new
     page = agent.get('http://sougaku.com/loto7/data/list1/')
@@ -116,80 +133,8 @@ class Loto7WinningResult < ApplicationRecord
     cell.text.strip.gsub(/[^\d]/, '').to_i
   end
 
-  public
-  def prize_data
-    (1..6).map do |rank|
-      {
-        rank: rank,
-        winners: send("prize_#{rank}_winners"),
-        amount: send("prize_#{rank}")
-      }
-    end
-  end
-
-  def main_numbers
-    [
-      main_num_1, main_num_2, main_num_3, main_num_4,
-      main_num_5, main_num_6, main_num_7
-    ]
-  end
-
-  def bonus_numbers
-    [bonus_num_1, bonus_num_2]
-  end
-
-  def formatted_lottery_date
-    lottery_date&.strftime('%Y年%m月%d日')
-  end
-
   # Prevent NoMethodError when date is nil
   def formatted_date(date)
     date&.strftime('%Y年%m月%d日')
-  end
-  self.table_name = 'loto7WinningResults'
-
-  scope :newest_first, -> { order(lottery_date: :desc) }
-
-  def winning_numbers
-    [
-      main_num_1,
-      main_num_2,
-      main_num_3,
-      main_num_4,
-      main_num_5,
-      main_num_6,
-      main_num_7
-    ].sort
-  end
-
-  def main_numbers
-    [
-      main_num_1,
-      main_num_2,
-      main_num_3,
-      main_num_4,
-      main_num_5,
-      main_num_6,
-      main_num_7
-    ].sort
-  end
-
-  def bonus_numbers
-    [bonus_num_1, bonus_num_2].sort
-  end
-
-  def formatted_lottery_date
-    lottery_date.strftime('%Y年%m月%d日')
-  end
-
-  def prize_data
-    [
-      { rank: 1, winners: prize_1_winners, prize: prize_1 },
-      { rank: 2, winners: prize_2_winners, prize: prize_2 },
-      { rank: 3, winners: prize_3_winners, prize: prize_3 },
-      { rank: 4, winners: prize_4_winners, prize: prize_4 },
-      { rank: 5, winners: prize_5_winners, prize: prize_5 },
-      { rank: 6, winners: prize_6_winners, prize: prize_6 }
-    ]
   end
 end

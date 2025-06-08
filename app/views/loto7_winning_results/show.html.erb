@@ -4,22 +4,18 @@
   <section class="detail-section">
     <h2 class="section-title">当選番号</h2>
     <div class="numbers-container">
+      <div class="numbers-label">本数字</div>
       <div class="main-numbers">
-        <div class="numbers-label">本数字</div>
-        <div class="numbers-list">
-          <% @loto7_winning_result.main_numbers.each do |number| %>
-            <span class="number"><%= number %></span>
-          <% end %>
-        </div>
+        <% @loto7_winning_result.main_numbers.each do |number| %>
+          <span class="number"><%= number %></span>
+        <% end %>
       </div>
 
+      <div class="numbers-label">ボーナス数字</div>
       <div class="bonus-numbers">
-        <div class="numbers-label">ボーナス数字</div>
-        <div class="numbers-list">
-          <% @loto7_winning_result.bonus_numbers.each do |number| %>
-            <span class="bonus-number"><%= number %></span>
-          <% end %>
-        </div>
+        <% @loto7_winning_result.bonus_numbers.each do |number| %>
+          <span class="bonus-number"><%= number %></span>
+        <% end %>
       </div>
     </div>
   </section>
@@ -40,7 +36,7 @@
             <tr>
               <td><%= prize[:rank] %>等</td>
               <td><%= number_with_delimiter(prize[:winners]) %>口</td>
-              <td><%= number_to_currency(prize[:prize], unit: "", precision: 0) %>円</td>
+              <td><%= number_to_currency(prize[:amount], unit: "", precision: 0) %>円</td>
             </tr>
           <% end %>
         </tbody>
@@ -60,6 +56,44 @@
 
 <% content_for :head do %>
   <style>
+    .numbers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .main-numbers, .bonus-numbers {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .numbers-label {
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .number, .bonus-number {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    .number {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .bonus-number {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
     .result-detail {
       max-width: 800px;
       margin: 0 auto;
@@ -137,117 +171,6 @@
 
     .back-button:hover {
       opacity: 0.9;
-    }
-  </style>
-  <style>
-    .result-detail {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .detail-section {
-      background-color: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: var(--primary-color);
-    }
-
-    .numbers-container {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .numbers-label {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .numbers-list {
-      display: flex;
-      gap: 10px;
-    }
-
-    .number, .bonus-number {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-
-    .number {
-      background-color: #f0f0f0;
-      color: #333;
-    }
-
-    .bonus-number {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .prize-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-
-    .prize-table th,
-    .prize-table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-
-    .prize-table th {
-      background-color: #f5f5f5;
-      font-weight: bold;
-    }
-
-    .carry-over {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-
-    .carry-over h3 {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
-
-    .amount {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-
-    .actions {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    .back-button {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: var(--primary-color);
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-
-    .back-button:hover {
-      background-color: #357abd;
     }
   </style>
 <% end %>

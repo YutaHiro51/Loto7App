@@ -17,18 +17,248 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <style>
+      :root {
+        --dark-bg: #1a1a1a;
+        --darker-bg: #141414;
+        --light-text: #e0e0e0;
+        --highlight: #2196f3;
+        --highlight-hover: #1976d2;
+      }
+
+      body {
+        background-color: var(--dark-bg);
+        color: var(--light-text);
+      }
+
+      .layout-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 250px;
+        background-color: var(--darker-bg);
+        padding: 20px 0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .main-content {
+        flex-grow: 1;
+        padding: 30px;
+        background-color: var(--dark-bg);
+      }
+
+      .page-title {
+        color: var(--light-text);
+        font-size: 2rem;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 10px;
+      }
+
+      .page-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: var(--highlight);
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .sidebar-menu li {
+        margin: 8px 16px;
+      }
+
+      .sidebar-menu a {
+        display: block;
+        padding: 12px 20px;
+        color: var(--light-text);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sidebar-menu a:hover {
+        background-color: rgba(33, 150, 243, 0.1);
+        transform: translateX(5px);
+      }
+
+      /* Common Components */
+      .result-card,
+      .detail-section {
+        background-color: var(--darker-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .result-card:hover {
+        border-color: var(--highlight);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .prize-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      .prize-table th {
+        background-color: rgba(33, 150, 243, 0.1);
+        color: var(--light-text);
+        font-weight: bold;
+        padding: 12px;
+        text-align: left;
+      }
+
+      .prize-table td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--light-text);
+      }
+
+      button,
+      .back-button {
+        background-color: var(--highlight);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      button:hover,
+      .back-button:hover {
+        background-color: var(--highlight-hover);
+        transform: translateY(-1px);
+      }
+
+      .sidebar-menu a.active {
+        background-color: var(--highlight);
+        color: white;
+      }
+
+      .sidebar-menu a:not(.active)::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background-color: var(--highlight);
+        transform: scaleY(0);
+        transition: transform 0.2s;
+      }
+
+      .sidebar-menu a:not(.active):hover::before {
+        transform: scaleY(1);
+      }
+
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+      }
+
+      .toast {
+        background-color: var(--darker-bg);
+        color: var(--light-text);
+        padding: 12px 24px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .toast.notice {
+        border-left: 4px solid var(--highlight);
+      }
+
+      .toast.alert {
+        border-left: 4px solid #f44336;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+    </style>
+
+    <script>
+      function showToast(message, type = 'notice') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+          setTimeout(() => {
+            container.removeChild(toast);
+          }, 300);
+        }, 3000);
+      }
+    </script>
   </head>
 
   <body>
     <div class="layout-container">
       <aside class="sidebar">
+        <h1 style="color: var(--highlight); text-align: center; margin-bottom: 30px; font-size: 1.5rem;">
+          Loto Seven
+        </h1>
         <nav>
           <ul class="sidebar-menu">
             <li>
-              <%= link_to "抽選結果一覧", loto7_winning_results_path, class: current_page?(controller: 'loto7_winning_results', action: 'index') ? 'active' : '' %>
+              <% is_winning_results_active = current_page?(controller: '/loto7_winning_results', action: 'index') %>
+              <%= link_to "抽選結果一覧", loto7_winning_results_path, class: is_winning_results_active ? 'active' : '' %>
             </li>
             <li>
-              <%= link_to "購入番号管理", loto7_purchases_path, class: current_page?(controller: 'loto7_purchases', action: 'index') ? 'active' : '' %>
+              <% is_analysis_active = current_page?(controller: '/loto7_winning_results', action: 'analysis') %>
+              <%= link_to "当選数字分析", analysis_loto7_winning_results_path, class: is_analysis_active ? 'active' : '' %>
+            </li>
+            <li>
+              <% is_purchases_active = current_page?(controller: '/loto7_purchases', action: 'index') %>
+              <%= link_to "購入番号管理", loto7_purchases_path, class: is_purchases_active ? 'active' : '' %>
+            </li>
+            <li>
+              <% is_new_purchase_active = current_page?(controller: '/loto7_purchases', action: 'new') %>
+              <%= link_to "購入番号作成", new_loto7_purchase_path, class: is_new_purchase_active ? 'active' : '' %>
             </li>
           </ul>
         </nav>
@@ -39,10 +269,11 @@
           <h1 class="page-title"><%= yield :page_title %></h1>
         <% end %>
 
+        <div id="toast-container"></div>
         <% flash.each do |name, msg| %>
-          <div class="flash-message <%= name %>">
-            <%= msg %>
-          </div>
+          <script>
+            showToast('<%= msg %>', '<%= name %>');
+          </script>
         <% end %>
 
         <%= yield %>

@@ -1,4 +1,8 @@
 class Loto7PurchasesController < ApplicationController
+  def new
+    @title = "クイックピック"
+  end
+
   def index
     @loto7_purchases = Loto7Purchase.all.order(created_at: :desc)
     @total_amount = Loto7Purchase.total_amount
@@ -36,7 +40,8 @@ class Loto7PurchasesController < ApplicationController
     end
 
     session[:check_results] = latest_result.id
-    redirect_to loto7_purchases_path(check: true), notice: '当選結果を確認しました'
+    message = "第#{latest_result.lottery_round}回抽選(#{latest_result.formatted_lottery_date})の結果を確認しました"
+    redirect_to loto7_purchases_path(check: true), notice: message
   end
 
   private

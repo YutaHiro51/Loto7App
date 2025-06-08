@@ -3,23 +3,51 @@
 <div class="purchase-list" data-turbo="false">
   <div class="header-section">
     <h2>購入番号一覧</h2>
-    <button onclick="openModal()" class="add-button">
-      <i class="fas fa-plus"></i>
-      購入番号を追加
-    </button>
+    <div class="header-buttons">
+      <button onclick="openModal()" class="action-button add-button">
+        <i class="fas fa-plus"></i>
+        購入番号を追加
+      </button>
+      <%= button_to check_results_loto7_purchases_path, method: :post, class: "action-button check-button", data: { turbo: false } do %>
+        <i class="fas fa-sync-alt"></i> 当選結果を確認
+      <% end %>
+    </div>
   </div>
   
-  <div class="total-amount">
-    合計金額: <%= number_to_currency(@total_amount, unit: "¥", precision: 0) %>
-  </div>
-
   <div class="numbers-table">
     <table>
-      <div class="button-group">
-        <%= button_to check_results_loto7_purchases_path, method: :post, class: "check-button", data: { turbo: false } do %>
-          <i class="fas fa-sync-alt"></i> 当選結果を確認
-        <% end %>
-      </div>
+
+      <% if @latest_result %>
+        <div class="lottery-info">
+          <h4>確認した抽選結果</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">抽選日:</span>
+              <span class="info-value"><%= @latest_result.formatted_lottery_date %></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">抽選回:</span>
+              <span class="info-value">第<%= @latest_result.lottery_round %>回</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">本数字:</span>
+              <div class="numbers-display">
+                <% @latest_result.main_numbers.each do |number| %>
+                  <span class="number main"><%= number %></span>
+                <% end %>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-label">ボーナス数字:</span>
+              <div class="numbers-display">
+                <% @latest_result.bonus_numbers.each do |number| %>
+                  <span class="number bonus"><%= number %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
 
       <thead>
         <tr>
@@ -66,6 +94,10 @@
         <% end %>
       </tbody>
     </table>
+  </div>
+
+  <div class="total-amount">
+    合計金額: <%= number_to_currency(@total_amount, unit: "円", precision: 0) %>
   </div>
   <div class="winning-conditions">
     <h3>当せん条件</h3>
@@ -224,23 +256,6 @@
       margin-left: 8px;
     }
 
-    .check-button {
-      margin: 10px 0;
-      padding: 8px 16px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .check-button:hover {
-      opacity: 0.9;
-    }
-
     .winning-result {
       display: inline-block;
       padding: 4px 8px;
@@ -330,6 +345,92 @@
       line-height: 1.4;
     }
   </style>
+
+  <style>
+    .numbers-display {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      margin-top: 5px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .info-item .number {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 1.1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-item .number.main {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .info-item .number.bonus {
+      background-color: #ffc107;
+      color: #000;
+    }
+
+    .lottery-info {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .lottery-info h4 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 5px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 15px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .info-item:nth-child(3),
+    .info-item:nth-child(4) {
+      align-self: start;
+    }
+
+    .numbers-display {
+      min-width: 320px;
+      justify-content: flex-start;
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
 </div>
 
 <%= render 'purchase_modal' %>
@@ -344,7 +445,40 @@
       margin-bottom: 20px;
     }
 
-    .add-button {
+    .header-buttons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .action-button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 12px 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 180px;
+      transition: background-color 0.2s;
+      height: 45px;
+    }
+
+    .action-button:hover {
+      background-color: #357abd;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .action-button {
       padding: 10px 20px;
       background-color: var(--primary-color);
       color: white;
@@ -355,9 +489,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      transition: background-color 0.2s;
+      min-width: 160px;
+      justify-content: center;
     }
 
-    .add-button:hover {
+    .action-button:hover {
       background-color: #357abd;
     }
 

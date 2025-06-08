@@ -1,9 +1,37 @@
 <% content_for :page_title, "ロト7 抽選結果一覧" %>
 
-<div class="action-buttons">
-  <%= button_to update_from_web_loto7_winning_results_path, method: :post, class: "update-button" do %>
-    <i class="fas fa-sync-alt"></i> 最新の抽選結果を取得
-  <% end %>
+<div class="header-actions">
+  <div class="filters">
+    <div class="filter-group">
+      <%= form_tag loto7_winning_results_path, method: :get, class: "filter-form", id: "filter-form" do %>
+        <div class="select-group">
+          <select name="year" id="year-select" class="filter-select">
+            <option value="">年で絞り込み</option>
+            <% @years.each do |year| %>
+              <option value="<%= year %>" <%= 'selected' if @filter_year == year %>><%= year %>年</option>
+            <% end %>
+          </select>
+
+          <select name="month" id="month-select" class="filter-select" <%= 'disabled' unless @filter_year.present? %>>
+            <option value="">月で絞り込み</option>
+            <% (1..12).each do |month| %>
+              <option value="<%= month %>" <%= 'selected' if @filter_month == month.to_s %>><%= month %>月</option>
+            <% end %>
+          </select>
+
+          <button type="button" id="clear-filter" class="clear-button" <%= 'disabled' unless @filter_year.present? || @filter_month.present? %>>
+            <i class="fas fa-times"></i> クリア
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <%= button_to update_from_web_loto7_winning_results_path, method: :post, class: "update-button" do %>
+      <i class="fas fa-sync-alt"></i> 最新の抽選結果を取得
+    <% end %>
+  </div>
 </div>
 
 <div class="results-list">
@@ -31,10 +59,69 @@
   <% end %>
 </div>
 
-<%= paginate @loto7_winning_results %>
-
 <% content_for :head do %>
   <style>
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+
+    .filters {
+      flex-grow: 1;
+    }
+
+    .filter-group {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .select-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      min-width: 150px;
+    }
+
+    .filter-select:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+
+    .clear-button {
+      padding: 8px 16px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      transition: opacity 0.2s;
+    }
+
+    .clear-button:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    .clear-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .action-buttons {
       margin-bottom: 20px;
     }
@@ -129,4 +216,37 @@
   </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const yearSelect = document.getElementById('year-select');
+      const monthSelect = document.getElementById('month-select');
+      const clearButton = document.getElementById('clear-filter');
+      const filterForm = document.getElementById('filter-form');
+
+      // 年の選択時
+      yearSelect.addEventListener('change', function() {
+        monthSelect.disabled = !this.value;
+        if (!this.value) {
+          monthSelect.value = '';
+        }
+        filterForm.submit();
+      });
+
+      // 月の選択時
+      monthSelect.addEventListener('change', function() {
+        if (this.value) {
+          filterForm.submit();
+        }
+      });
+
+      // クリアボタン
+      clearButton.addEventListener('click', function() {
+        yearSelect.value = '';
+        monthSelect.value = '';
+        monthSelect.disabled = true;
+        filterForm.submit();
+      });
+    });
+  </script>
 <% end %>

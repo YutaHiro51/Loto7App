@@ -2,19 +2,26 @@
 
 <div class="result-detail">
   <section class="detail-section">
-    <h2 class="section-title">当選番号</h2>
+    <h2 class="section-title">
+      当選番号
+      <span class="set-ball-info">セット<%= @loto7_winning_result.set_ball %></span>
+    </h2>
     <div class="numbers-container">
       <div class="numbers-label">本数字</div>
       <div class="main-numbers">
         <% @loto7_winning_result.main_numbers.each do |number| %>
-          <span class="number"><%= number %></span>
+          <span class="number" style="background-color: <%= @loto7_winning_result.get_number_color(number) %>">
+            <%= number %>
+          </span>
         <% end %>
       </div>
 
       <div class="numbers-label">ボーナス数字</div>
       <div class="bonus-numbers">
         <% @loto7_winning_result.bonus_numbers.each do |number| %>
-          <span class="bonus-number"><%= number %></span>
+          <span class="bonus-number" style="background-color: <%= @loto7_winning_result.get_number_color(number) %>">
+            <%= number %>
+          </span>
         <% end %>
       </div>
     </div>
@@ -84,14 +91,16 @@
       font-weight: bold;
     }
 
-    .number {
-      background-color: #f0f0f0;
-      color: #333;
+    .number,
+    .bonus-number {
+      color: white;
+      font-weight: bold;
+      -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     }
 
     .bonus-number {
-      background-color: var(--primary-color);
-      color: white;
+      filter: brightness(1.1);
     }
 
     .result-detail {
@@ -100,7 +109,8 @@
     }
 
     .detail-section {
-      background: white;
+      background: var(--darker-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -108,10 +118,22 @@
     }
 
     .section-title {
-      color: var(--primary-color);
+      color: var(--light-text);
       margin-bottom: 15px;
       padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .set-ball-info {
+      background-color: var(--dark-bg);
+      color: var(--light-text);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: normal;
     }
 
     .prize-table {
@@ -129,13 +151,14 @@
     }
 
     .prize-table th {
-      background-color: #f8f9fa;
+      background-color: rgba(255, 255, 255, 0.05);
       font-weight: bold;
       color: var(--primary-color);
     }
 
     .carry-over {
-      background-color: #f8f9fa;
+      background-color: var(--darker-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 15px;
       border-radius: 4px;
       margin-top: 20px;
@@ -150,7 +173,7 @@
     .carry-over .amount {
       font-size: 1.2rem;
       font-weight: bold;
-      color: #333;
+      color: var(--light-text);
       margin: 0;
     }
 

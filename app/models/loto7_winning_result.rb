@@ -1,6 +1,118 @@
 require 'mechanize'
 
 class Loto7WinningResult < ApplicationRecord
+  BALL_COLORS = {
+    red: '#e53935',      # 中間赤
+    orange: '#f4511e',   # 中間オレンジ
+    yellow: '#fdd835',   # 中間黄
+    green: '#43a047',    # 中間緑
+    blue: '#1e88e5',     # 中間青
+    purple: '#8e24aa',   # 中間紫
+    pink: '#d81b60'      # 中間ピンク
+  }
+
+  SET_BALL_NUMBER_COLORS = {
+    'A' => {
+      red: [1, 8, 15, 22, 29, 36],
+      orange: [2, 9, 16, 23, 30, 37],
+      yellow: [3, 10, 17, 24, 31],
+      green: [4, 11, 18, 25, 32],
+      blue: [5, 12, 19, 26, 33],
+      purple: [6, 13, 20, 27, 34],
+      pink: [7, 14, 21, 28, 35]
+    },
+    'B' => {
+      red: [7, 14, 21, 28, 35],
+      orange: [1, 8, 15, 22, 29, 36],
+      yellow: [2, 9, 16, 23, 30, 37],
+      green: [3, 10, 17, 24, 31],
+      blue: [4, 11, 18, 25, 32],
+      purple: [5, 12, 19, 26, 33],
+      pink: [6, 13, 20, 27, 34]
+    },
+    'C' => {
+      red: [6, 13, 20, 27, 34],
+      orange: [7, 14, 21, 28, 35],
+      yellow: [1, 8, 15, 22, 29, 36],
+      green: [2, 9, 16, 23, 30, 37],
+      blue: [3, 10, 17, 24, 31],
+      purple: [4, 11, 18, 25, 32],
+      pink: [5, 12, 19, 26, 33]
+    },
+    'D' => {
+      red: [5, 12, 19, 26, 33],
+      orange: [6, 13, 20, 27, 34],
+      yellow: [7, 14, 21, 28, 35],
+      green: [1, 8, 15, 22, 29, 36],
+      blue: [2, 9, 16, 23, 30, 37],
+      purple: [3, 10, 17, 24, 31],
+      pink: [4, 11, 18, 25, 32]
+    },
+    'E' => {
+      red: [4, 11, 18, 25, 32],
+      orange: [5, 12, 19, 26, 33],
+      yellow: [6, 13, 20, 27, 34],
+      green: [7, 14, 21, 28, 35],
+      blue: [1, 8, 15, 22, 29, 36],
+      purple: [2, 9, 16, 23, 30, 37],
+      pink: [3, 10, 17, 24, 31]
+    },
+    'F' => {
+      red: [7, 14, 21, 28, 35],
+      orange: [6, 13, 20, 27, 34],
+      yellow: [5, 12, 19, 26, 33],
+      green: [4, 11, 18, 25, 32],
+      blue: [3, 10, 17, 24, 31],
+      purple: [2, 9, 16, 23, 30, 37],
+      pink: [1, 8, 15, 22, 29, 36]
+    },
+    'G' => {
+      red: [6, 13, 20, 27, 34],
+      orange: [5, 12, 19, 26, 33],
+      yellow: [4, 11, 18, 25, 32],
+      green: [3, 10, 17, 24, 31],
+      blue: [2, 9, 16, 23, 30, 37],
+      purple: [1, 8, 15, 22, 29, 36],
+      pink: [7, 14, 21, 28, 35]
+    },
+    'H' => {
+      red: [5, 12, 19, 26, 33],
+      orange: [4, 11, 18, 25, 32],
+      yellow: [3, 10, 17, 24, 31],
+      green: [2, 9, 16, 23, 30, 37],
+      blue: [1, 8, 15, 22, 29, 36],
+      purple: [7, 14, 21, 28, 35],
+      pink: [6, 13, 20, 27, 34]
+    },
+    'I' => {
+      red: [4, 11, 18, 25, 32],
+      orange: [3, 10, 17, 24, 31],
+      yellow: [2, 9, 16, 23, 30, 37],
+      green: [1, 8, 15, 22, 29, 36],
+      blue: [7, 14, 21, 28, 35],
+      purple: [6, 13, 20, 27, 34],
+      pink: [5, 12, 19, 26, 33]
+    },
+    'J' => {
+      red: [3, 10, 17, 24, 31],
+      orange: [2, 9, 16, 23, 30, 37],
+      yellow: [1, 8, 15, 22, 29, 36],
+      green: [7, 14, 21, 28, 35],
+      blue: [6, 13, 20, 27, 34],
+      purple: [5, 12, 19, 26, 33],
+      pink: [4, 11, 18, 25, 32]
+    }
+  }
+
+  def get_number_color(number)
+    return nil unless set_ball
+
+    SET_BALL_NUMBER_COLORS[set_ball]&.each do |color_key, numbers|
+      return BALL_COLORS[color_key] if numbers.include?(number)
+    end
+    nil
+  end
+
   self.table_name = 'loto7WinningResults'
   
   attr_reader :lottery_round

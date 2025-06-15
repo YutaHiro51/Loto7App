@@ -96,11 +96,49 @@
 
       /* Common Components */
       .result-card,
-      .detail-section {
+      .detail-section,
+      .filter-group,
+      .carry-over,
+      .number-stats,
+      .purchase-form,
+      .purchase-card {
         background-color: var(--darker-bg);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Inputs & Selects */
+      input[type="text"],
+      input[type="number"],
+      select,
+      .filter-select {
+        background-color: var(--dark-bg);
+        color: var(--light-text);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        padding: 8px 12px;
+      }
+
+      input[type="text"]:disabled,
+      input[type="number"]:disabled,
+      select:disabled,
+      .filter-select:disabled {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* Stats & Numbers */
+      .stat-bar {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .stat-bar::before {
+        background-color: var(--highlight);
+      }
+
+      .stat-count {
+        color: var(--light-text);
       }
 
       .result-card:hover {
@@ -240,7 +278,7 @@
     <div class="layout-container">
       <aside class="sidebar">
         <h1 style="color: var(--highlight); text-align: center; margin-bottom: 30px; font-size: 1.5rem;">
-          Loto Seven
+          Loto7
         </h1>
         <nav>
           <ul class="sidebar-menu">

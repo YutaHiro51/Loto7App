@@ -8,13 +8,19 @@
     <div class="modal-body">
       <%= form_with(model: Loto7Purchase.new, local: true, class: "number-form") do |f| %>
         <%= f.hidden_field :number_set %>
-        <div class="number-inputs">
-          <% 7.times do |i| %>
-            <div class="number-input-group">
-              <label>第<%= i + 1 %>数字</label>
-              <input type="number" min="1" max="37" class="number-field" data-index="<%= i %>" required>
-            </div>
-          <% end %>
+        <div class="numbers-selection">
+          <div class="number-inputs">
+            <% 7.times do |i| %>
+              <div class="number-input-group">
+                <label>第<%= i + 1 %>数字</label>
+                <input type="number" min="1" max="37" class="number-field" data-index="<%= i %>" required>
+              </div>
+            <% end %>
+          </div>
+          <div class="input-hints">
+            <p>※ 1から37の数字を入力してください</p>
+            <p>※ 重複した数字は使用できません</p>
+          </div>
         </div>
         <%= f.submit "登録", class: "submit-button", data: { disable_with: "登録中..." } %>
       <% end %>
@@ -36,13 +42,15 @@
 
 .modal-content {
   position: relative;
-  background-color: white;
+  background-color: var(--darker-bg);
   margin: 10% auto;
   padding: 20px;
-  width: 80%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 800px;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  color: var(--light-text);
 }
 
 .modal-header {
@@ -57,15 +65,112 @@
   background: none;
   font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: var(--light-text);
 }
 
 .close-button:hover {
-  color: #333;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .modal-body {
-  padding: 20px 0;
+  padding: 20px;
+}
+
+.numbers-selection {
+  margin: 15px 0;
+  padding: 10px;
+}
+
+.number-inputs {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin: 0 auto 20px;
+  padding: 15px;
+  max-width: 95%;
+}
+
+.number-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.number-input-group label {
+  color: var(--light-text);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.number-field {
+  width: 50px;
+  height: 50px;
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.number-field:focus {
+  border-color: var(--highlight);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+  transform: scale(1.05);
+}
+
+.input-hints {
+  text-align: center;
+  padding: 15px;
+  background-color: var(--dark-bg);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.input-hints p {
+  color: var(--light-text);
+  opacity: 0.7;
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--highlight);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: var(--highlight-hover);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .number-inputs {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 5% auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .number-inputs {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 </style>
 

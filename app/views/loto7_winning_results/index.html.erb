@@ -38,20 +38,29 @@
   <% @loto7_winning_results.each do |result| %>
     <%= link_to loto7_winning_result_path(result), class: "result-card" do %>
       <div class="result-header">
-        <span class="lottery-round">第<%= result.lottery_round %>回</span>
-        <span class="lottery-date"><%= result.formatted_lottery_date %></span>
+        <div class="lottery-info">
+          <span class="lottery-round">第<%= result.lottery_round %>回</span>
+          <div class="lottery-meta">
+            <span class="set-ball">セット球：<%= result.set_ball %></span>
+            <span class="lottery-date"><%= result.formatted_lottery_date %></span>
+          </div>
+        </div>
       </div>
 
       <div class="numbers-container">
         <div class="main-numbers">
           <% result.main_numbers.each do |number| %>
-            <span class="number"><%= number %></span>
+            <span class="number" style="background-color: <%= result.get_number_color(number) %>">
+              <%= number %>
+            </span>
           <% end %>
         </div>
 
         <div class="bonus-numbers">
           <% result.bonus_numbers.each do |number| %>
-            <span class="bonus-number"><%= number %></span>
+            <span class="bonus-number" style="background-color: <%= result.get_number_color(number) %>">
+              <%= number %>
+            </span>
           <% end %>
         </div>
       </div>
@@ -169,18 +178,38 @@
     }
 
     .result-header {
+      margin-bottom: 15px;
+    }
+
+    .lottery-info {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 15px;
+      align-items: center;
     }
 
     .lottery-round {
       font-weight: bold;
-      color: var(--primary-color);
+      color: var(--light-text);
+    }
+
+    .lottery-meta {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .set-ball {
+      display: inline-block;
+      background-color: var(--darker-bg);
+      color: var(--light-text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
     }
 
     .lottery-date {
-      color: #666;
+      color: var(--light-text);
+      opacity: 0.7;
     }
 
     .numbers-container {
@@ -205,13 +234,16 @@
     }
 
     .number {
-      background-color: #f0f0f0;
-      color: #333;
+      color: white;
+      font-weight: bold;
+      -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     }
 
     .bonus-number {
-      background-color: var(--primary-color);
       color: white;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      filter: brightness(1.1);
     }
   </style>
 

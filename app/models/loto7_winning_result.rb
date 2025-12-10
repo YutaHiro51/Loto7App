@@ -1,6 +1,11 @@
 require 'mechanize'
 
 class Loto7WinningResult < ApplicationRecord
+  # クラスメソッドを追加：総抽選回数を取得
+  def self.total_draws
+    count
+  end
+
   BALL_COLORS = {
     red: '#e53935',      # 中間赤
     orange: '#f4511e',   # 中間オレンジ

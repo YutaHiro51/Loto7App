@@ -6,6 +6,7 @@ class Loto7PurchasesController < ApplicationController
   def index
     @loto7_purchases = Loto7Purchase.all.order(created_at: :desc)
     @total_amount = Loto7Purchase.total_amount
+    @winning_statistics = Loto7Purchase.total_winning_statistics
     if session[:check_results]
       @latest_result = Loto7WinningResult.find(session[:check_results])
       session.delete(:check_results)

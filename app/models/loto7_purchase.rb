@@ -3,6 +3,33 @@ class Loto7Purchase < ApplicationRecord
   validate :validate_number_set_format
   validates :price, presence: true, numericality: { equal_to: 300 }
 
+  # 全期間の当選実績を集計
+  def self.total_winning_statistics
+    draws = Loto7WinningResult.total_draws
+    total_purchase = draws * 1500  # 1回の抽選で5口（1500円）
+    statistics = {
+      total_purchase: total_purchase,
+      total_winning: 0,
+      balance: 0,
+      by_rank: Hash.new { |h, k| h[k] = { count: 0, amount: 0 } }
+    }
+
+    all.each do |purchase|
+      Loto7WinningResult.all.each do |result|
+        if win_info = purchase.check_result(result)
+          rank = win_info[:rank]
+          prize = win_info[:prize]
+          statistics[:by_rank][rank][:count] += 1
+          statistics[:by_rank][rank][:amount] += prize
+          statistics[:total_winning] += prize
+        end
+      end
+    end
+
+    statistics[:balance] = statistics[:total_winning] - statistics[:total_purchase]
+    statistics
+  end
+
   def purchase_numbers
     number_set.split(',').map(&:to_i).sort
   end

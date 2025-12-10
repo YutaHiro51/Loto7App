@@ -96,9 +96,52 @@
     </table>
   </div>
 
-  <div class="total-amount">
-    合計金額: <%= number_to_currency(@total_amount, unit: "円", precision: 0) %>
+  <div class="winning-statistics">
+    <h3>当選金額統計</h3>
+    <div class="statistics-summary">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="label">総購入金額:</span>
+          <span class="value purchase"><%= number_to_currency(@winning_statistics[:total_purchase], unit: "円", precision: 0) %></span>
+        </div>
+        <div class="summary-item">
+          <span class="label">総当選金額:</span>
+          <span class="value winning"><%= number_to_currency(@winning_statistics[:total_winning], unit: "円", precision: 0) %></span>
+        </div>
+        <div class="summary-item">
+          <span class="label">収支:</span>
+          <span class="value balance <%= @winning_statistics[:balance] >= 0 ? 'positive' : 'negative' %>">
+            <%= number_to_currency(@winning_statistics[:balance], unit: "円", precision: 0) %>
+          </span>
+        </div>
+      </div>
+      <div class="statistics-details">
+        <table>
+          <thead>
+            <tr>
+              <th>等級</th>
+              <th>当選回数</th>
+              <th>当選金額</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @winning_statistics[:by_rank].sort.each do |rank, data| %>
+              <tr>
+                <td><%= "#{rank}等" %></td>
+                <td><%= data[:count] %>回</td>
+                <td><%= number_to_currency(data[:amount], unit: "円", precision: 0) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
+  <% if @latest_result && @total_winning_amount %>
+    <div class="total-amount winning">
+      当選金額合計: <%= number_to_currency(@total_winning_amount, unit: "円", precision: 0) %>
+    </div>
+  <% end %>
   <div class="winning-conditions">
     <h3>当せん条件</h3>
     <div class="conditions-grid">
@@ -297,6 +340,61 @@
     .numbers-table th:nth-child(1) { width: 40%; }
     .numbers-table th:nth-child(2) { width: 40%; }
     .numbers-table th:nth-child(3) { width: 20%; }
+
+    .winning-statistics {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: var(--darker-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .winning-statistics h3 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 8px;
+    }
+
+    .statistics-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .total-winning {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #28a745;
+      padding: 10px;
+      background-color: var(--dark-bg);
+      border-radius: 4px;
+    }
+
+    .statistics-details table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 10px;
+    }
+
+    .statistics-details th,
+    .statistics-details td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .statistics-details th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+    }
+
+    .statistics-details tr:hover {
+      background-color: var(--dark-bg);
+    }
 
     .winning-conditions {
       margin-top: 30px;
@@ -552,6 +650,13 @@
       background-color: var(--darker-bg);
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .total-amount.winning {
+      color: #28a745;
+      margin-top: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0 0 8px 8px;
     }
   </style>
 <% end %>
